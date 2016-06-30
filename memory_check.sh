@@ -18,7 +18,7 @@ while getopts ":c:w:e:" opt; do
         e)
           email=$OPTARG;;
         :)
-          echo "Invalid Parameters"
+          echo "Invalid Parameters, please supply -w 60 -c 90 -e email@me.com"
           exit 0
           ;;
     esac
