@@ -1,3 +1,5 @@
+#Francis Regor V. Panlilio
+
 #!/bin/bash
 clear
 
