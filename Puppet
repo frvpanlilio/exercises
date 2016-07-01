@@ -1,0 +1,77 @@
+node 'bpx.server.local' {
+ include 'application_install'
+ include 'directory_at_user'
+ include 'excute_command'
+ include 'symlinker'
+}
+
+class application_install {
+
+package { 'vim-enhanced':
+       provider => yum,
+       ensure => installed,
+}
+package { 'curl':
+       provider => yum,
+       ensure => installed,
+}
+package { 'git':
+       provider => yum,
+       ensure => installed,
+}
+
+}
+
+class directory_at_user {
+
+user { 'monitor':
+
+       ensure => "present",
+       shell => '/bin/bash',
+       home => '/home/monitor',
+       managehome => true,
+}
+file { '/home/monitor/scripts':
+       ensure => 'directory',
+       owner => 'monitor',
+       group => 'monitor',
+       mode => '700',
+}
+file { '/home/monitor/src':
+       ensure => 'directory',
+       owner => 'monitor',
+       group => 'monitor',
+       mode => '700',
+}
+
+}
+
+class excute_command {
+
+exec { 'script':
+       command => "/usr/bin/wget --no-check-certificate https://raw.githubusercontent.com/frvpanlilio/exercises/master/memory_check.sh -O /home/monitor/scripts/memory_check",
+       creates => "/home/monitor/scripts/memory_check",
+}
+file { '/home/monitor/scripts/memory_check':
+      mode => '777',
+       require => Exec["script"],
+}
+
+cron { 'cron':
+       command => 'sh /home/monitor/src/my_memory_check -w 60 -c 90 -e frvpanlilio@chikka.com',
+       hour => '*',
+       minute => '*/1',
+       weekday => '*',
+       month => '*',
+       monthday => "*",
+}
+
+}
+
+class symlinker {
+
+file { '/home/monitor/src/my_memory_check':
+       ensure => link,
+       target => '/home/monitor/scripts/memory_check',
+}
+}
